@@ -1,0 +1,59 @@
+<div class="table-container">
+  <h2>Students Management</h2>
+
+  <table class="data-table">
+
+    <thead>
+      <tr>
+        <th style="width: 10%;">ID</th>
+        <th style="width: 35%;">First Name</th>
+        <th style="width: 35%;">Last Name</th>
+        <th style="width: 20%;">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+  
+      @for (s of students; track s.id) {
+        <tr>
+        
+          @if (editingId !== s.id) {
+            <td>{{ s.id }}</td>
+            <td>{{ s.firstName }}</td>
+            <td>{{ s.lastName }}</td>
+            <td>
+              <button class="btn btn-edit" (click)="startEdit(s)">Edit</button>
+              <button class="btn btn-delete" (click)="deleteStudent(s.id)">Delete</button>
+            </td>
+          } 
+
+          @else {
+            <td>{{ s.id }}</td>
+
+            <td><input type="text" [(ngModel)]="editForm.firstName" /></td>
+            <td><input type="text" [(ngModel)]="editForm.lastName" /></td>
+            <td>
+
+              <button class="btn btn-save" (click)="saveEdit()">Save</button>
+
+              <button class="btn btn-cancel" (click)="cancelEdit()">Cancel</button>
+            </td>
+          }
+        </tr>
+      }
+
+      <tr class="add-row">
+        <td><em>Auto</em></td>
+        <td>
+          <input type="text" [(ngModel)]="newStudent.firstName" placeholder="First Name" />
+        </td>
+        <td>
+          <input type="text" [(ngModel)]="newStudent.lastName" placeholder="Last Name" />
+        </td>
+        <td>
+          <button class="btn btn-create" (click)="createStudent()">Add Student</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

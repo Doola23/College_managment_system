@@ -1,0 +1,132 @@
+.table-container {
+  padding: 24px;
+}
+
+h2 {
+  margin-top: 0;
+  color: #1e293b;
+}
+
+.search-box {
+  background-color: #ffffff;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.search-box label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #334155;
+}
+
+.search-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.search-controls input {
+  width: 200px;
+}
+
+.details-card {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #dbeafe;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+.details-header h3 {
+  margin: 0;
+  color: #1e40af;
+  font-size: 1.1rem;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.details-grid p {
+  margin: 0;
+  color: #1e3a8a;
+}
+
+.alert-error {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.data-table th, 
+.data-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.data-table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #475569;
+}
+
+.add-row {
+  background-color: #f1f5f9;
+}
+
+input[type="text"],
+input[type="number"] {
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.btn {
+  padding: 6px 12px;
+  margin-right: 6px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn:hover {
+  opacity: 0.85;
+}
+
+.btn-search { background-color: #3b82f6; color: white; }
+.btn-info { background-color: #0284c7; color: white; }
+.btn-edit { background-color: #475569; color: white; }
+.btn-delete { background-color: #ef4444; color: white; }
+.btn-save { background-color: #16a34a; color: white; }
+.btn-cancel { background-color: #64748b; color: white; }
+.btn-create { background-color: #059669; color: white; }
+.btn-close { background-color: #94a3b8; color: white; }

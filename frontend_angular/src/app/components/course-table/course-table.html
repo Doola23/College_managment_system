@@ -1,0 +1,51 @@
+<div class="table-container">
+  <h2>Courses Management</h2>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width: 15%;">ID</th>
+        <th style="width: 55%;">Course Name</th>
+        <th style="width: 30%;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (c of courses; track c.id) {
+        <tr>
+          @if (editingId !== c.id) {
+            <!-- Display Mode -->
+            <td>{{ c.id }}</td>
+            <td>{{ c.courseName }}</td>
+            <td>
+              <button class="btn btn-edit" (click)="startEdit(c)">Edit</button>
+              <button class="btn btn-delete" (click)="deleteCourse(c.id)">Delete</button>
+            </td>
+          } @else {
+            <!-- Inline Edit Mode -->
+            <td>{{ c.id }}</td>
+            <td><input type="text" [(ngModel)]="editForm.courseName" /></td>
+            <td>
+              <button class="btn btn-save" (click)="saveEdit()">Save</button>
+              <button class="btn btn-cancel" (click)="cancelEdit()">Cancel</button>
+            </td>
+          }
+        </tr>
+      }
+
+      <!-- Bottom Creation Row -->
+      <tr class="add-row">
+        <td><em>Auto</em></td>
+        <td>
+          <input 
+            type="text" 
+            [(ngModel)]="newCourse.courseName" 
+            placeholder="Course Name" 
+          />
+        </td>
+        <td>
+          <button class="btn btn-create" (click)="createCourse()">Add Course</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

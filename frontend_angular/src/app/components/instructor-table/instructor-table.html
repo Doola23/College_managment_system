@@ -1,0 +1,69 @@
+<div class="table-container">
+  <h2>Instructors Management</h2>
+
+  <!-- Read-Only Details Card -->
+  @if (selectedInstructor) {
+    <div class="details-card">
+      <div class="details-header">
+        <h3>Details: {{ selectedInstructor.firstName }} {{ selectedInstructor.lastName }} (ID: {{ selectedInstructor.id }})</h3>
+        <button class="btn btn-close" (click)="closeDetails()">Close</button>
+      </div>
+
+      <div class="details-grid">
+        <p><strong>Course:</strong> {{ selectedInstructor.courseName || 'Not Assigned' }}</p>
+        <p><strong>Age:</strong> {{ selectedInstructor.age !== undefined && selectedInstructor.age !== null ? selectedInstructor.age : 'N/A' }}</p>
+        <p><strong>Email:</strong> {{ selectedInstructor.email || 'N/A' }}</p>
+        <p><strong>Graduated College:</strong> {{ selectedInstructor.graduatedCollege || 'N/A' }}</p>
+      </div>
+    </div>
+  }
+
+  <!-- Main Table -->
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width: 10%;">ID</th>
+        <th style="width: 30%;">First Name</th>
+        <th style="width: 30%;">Last Name</th>
+        <th style="width: 30%;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (ins of instructors; track ins.id) {
+        <tr>
+          @if (editingId !== ins.id) {
+            <td>{{ ins.id }}</td>
+            <td>{{ ins.firstName }}</td>
+            <td>{{ ins.lastName }}</td>
+            <td>
+              <button class="btn btn-info" (click)="viewDetails(ins)">View Details</button>
+              <button class="btn btn-edit" (click)="startEdit(ins)">Edit</button>
+              <button class="btn btn-delete" (click)="deleteInstructor(ins.id)">Delete</button>
+            </td>
+          } @else {
+            <td>{{ ins.id }}</td>
+            <td><input type="text" [(ngModel)]="editForm.firstName" /></td>
+            <td><input type="text" [(ngModel)]="editForm.lastName" /></td>
+            <td>
+              <button class="btn btn-save" (click)="saveEdit()">Save</button>
+              <button class="btn btn-cancel" (click)="cancelEdit()">Cancel</button>
+            </td>
+          }
+        </tr>
+      }
+
+      <tr class="add-row">
+        <td><em>Auto</em></td>
+        <td>
+          <input type="text" [(ngModel)]="newInstructor.firstName" placeholder="First Name" />
+        </td>
+        <td>
+          <input type="text" [(ngModel)]="newInstructor.lastName" placeholder="Last Name" />
+        </td>
+        <td>
+          <button class="btn btn-create" (click)="createInstructor()">Add Instructor</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

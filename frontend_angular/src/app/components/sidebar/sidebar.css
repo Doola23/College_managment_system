@@ -1,0 +1,48 @@
+.sidebar {
+  width: 220px;
+  background-color: #1e293b;
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  box-sizing: border-box;
+}
+
+.sidebar-header h3 {
+  margin: 0 0 20px 0;
+  padding: 0 20px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #38bdf8;
+}
+
+.nav-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-links li button {
+  width: 100%;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  color: #cbd5e1;
+  text-align: left;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.nav-links li button:hover {
+  background-color: #334155;
+  color: #ffffff;
+}
+.nav-links li button.active {
+  background-color: #0284c7;
+  color: #ffffff;
+  font-weight: 600;
+}

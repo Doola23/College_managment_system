@@ -1,0 +1,62 @@
+.table-container {
+  padding: 24px;
+}
+
+h2 {
+  margin-top: 0;
+  color: #1e293b;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.data-table th, 
+.data-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.data-table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #475569;
+}
+
+.add-row {
+  background-color: #f1f5f9;
+}
+
+input[type="text"] {
+  width: 90%;
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.btn {
+  padding: 6px 12px;
+  margin-right: 6px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn:hover {
+  opacity: 0.85;
+}
+
+.btn-edit { background-color: #0284c7; color: white; }
+.btn-delete { background-color: #ef4444; color: white; }
+.btn-save { background-color: #16a34a; color: white; }
+.btn-cancel { background-color: #64748b; color: white; }
+.btn-create { background-color: #059669; color: white; }

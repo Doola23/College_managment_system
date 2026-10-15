@@ -1,0 +1,29 @@
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <h3>College Portal</h3>
+  </div>
+
+  <ul class="nav-links">
+    <li>
+      <button 
+        [class.active]="activeView === 'students'" 
+        (click)="selectView('students')">
+        Students
+      </button>
+    </li>
+    <li>
+      <button 
+        [class.active]="activeView === 'courses'" 
+        (click)="selectView('courses')">
+        Courses
+      </button>
+    </li>
+    <li>
+      <button 
+        [class.active]="activeView === 'instructors'" 
+        (click)="selectView('instructors')">
+        Instructors
+      </button>
+    </li>
+  </ul>
+</nav>

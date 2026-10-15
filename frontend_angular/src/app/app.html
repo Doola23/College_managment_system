@@ -1,0 +1,17 @@
+<div class="app-layout">
+  <!-- Pass currentView so sidebar knows which button to highlight -->
+  <app-sidebar 
+    [activeView]="currentView" 
+    (viewChange)="onViewChange($event)">
+  </app-sidebar>
+
+  <main class="content-area">
+    @if (currentView === 'students') {
+      <app-student-table></app-student-table>
+    } @else if (currentView === 'courses') {
+      <app-course-table></app-course-table>
+    } @else if (currentView === 'instructors') {
+      <app-instructor-table></app-instructor-table>
+    }
+  </main>
+</div>

@@ -24,10 +24,8 @@ public class Instructor {
     @JoinColumn(name = "course_id")
     private Course course;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "instructor_details_id")
+    @OneToOne(mappedBy = "instructor", cascade = CascadeType.ALL)
     private InstructorDetails instructorDetails;
-
     public Instructor(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
