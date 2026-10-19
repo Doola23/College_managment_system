@@ -1,17 +1,15 @@
-<div class="app-layout">
-  <!-- Pass currentView so sidebar knows which button to highlight -->
-  <app-sidebar 
-    [activeView]="currentView" 
-    (viewChange)="onViewChange($event)">
-  </app-sidebar>
+@if (authService.isLoggedIn()) {
+  <header class="navbar">
+    <div class="brand">College Management</div>
+    <nav class="nav-links">
+      <a routerLink="/instructors" routerLinkActive="active">Instructors</a>
+      <a routerLink="/courses" routerLinkActive="active">Courses</a>
+      <a routerLink="/students" routerLinkActive="active">Students</a>
+    </nav>
+    <button class="btn-logout" (click)="onLogout()">Logout</button>
+  </header>
+}
 
-  <main class="content-area">
-    @if (currentView === 'students') {
-      <app-student-table></app-student-table>
-    } @else if (currentView === 'courses') {
-      <app-course-table></app-course-table>
-    } @else if (currentView === 'instructors') {
-      <app-instructor-table></app-instructor-table>
-    }
-  </main>
-</div>
+<main class="main-container">
+  <router-outlet></router-outlet>
+</main>

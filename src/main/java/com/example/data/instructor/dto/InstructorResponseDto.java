@@ -1,43 +1,39 @@
 package com.example.data.instructor.dto;
 
 import com.example.data.instructor.Instructor;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.example.data.instructor.InstructorDetails;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class InstructorResponseDto {
-
-    private Long id;
-    private String firstName;
-    private String lastName;
-    private String courseName;
-    private Integer age;
-    private String email;
-    private String graduatedCollege;
-
+public record InstructorResponseDto(
+        Long id,
+        String firstName,
+        String lastName,
+        Long courseId,
+        Integer age,
+        String email,
+        String graduatedCollege
+) {
     public static InstructorResponseDto fromEntity(Instructor instructor) {
-        if (instructor == null) return null;
+        Long assignedCourseId = instructor.getCourse() != null ? instructor.getCourse().getId() : null;
 
-        InstructorResponseDto dto = new InstructorResponseDto();
-        dto.setId(instructor.getId());
-        dto.setFirstName(instructor.getFirstName());
-        dto.setLastName(instructor.getLastName());
+        Integer age = null;
+        String email = null;
+        String college = null;
 
-        if (instructor.getCourse() != null) {
-            dto.setCourseName(instructor.getCourse().getCourseName());
+        InstructorDetails details = instructor.getInstructorDetails();
+        if (details != null) {
+            age = details.getAge();
+            email = details.getEmail();
+            college = details.getGraduatedCollege();
         }
 
-        if (instructor.getInstructorDetails() != null) {
-            dto.setAge(instructor.getInstructorDetails().getAge());
-            dto.setEmail(instructor.getInstructorDetails().getEmail());
-            dto.setGraduatedCollege(instructor.getInstructorDetails().getGraduatedCollege());
-        }
-
-        return dto;
+        return new InstructorResponseDto(
+                instructor.getId(),
+                instructor.getFirstName(),
+                instructor.getLastName(),
+                assignedCourseId,
+                age,
+                email,
+                college
+        );
     }
 }

@@ -1,8 +1,13 @@
 package com.example.data.student;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
+import java.util.List;
+
 public interface StudentRepository extends JpaRepository<Student, Long> {
+
+    @Override
+    @EntityGraph(attributePaths = "courses")
+    List<Student> findAll();
 }

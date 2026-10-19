@@ -1,26 +1,19 @@
-import { Component } from '@angular/core';
-import { SidebarComponent } from './components/sidebar/sidebar';
-import { StudentTableComponent } from './components/student-table/student-table';
-import { CourseTableComponent } from './components/course-table/course-table';
-import { InstructorTableComponent } from './components/instructor-table/instructor-table';
+import { Component, inject } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { AuthService } from './services/auth';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    SidebarComponent,
-    StudentTableComponent,
-    InstructorTableComponent,
-    CourseTableComponent
-  ],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
 export class AppComponent {
-  title = 'frontend_angular';
-  currentView: string = 'students';
+  authService = inject(AuthService);
 
-  onViewChange(view: string): void {
-    this.currentView = view;
+  onLogout(): void {
+    this.authService.logout();
   }
 }

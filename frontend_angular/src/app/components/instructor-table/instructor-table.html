@@ -1,69 +1,121 @@
-<div class="table-container">
+<div class="instructors-container">
   <h2>Instructors Management</h2>
 
-  <!-- Read-Only Details Card -->
   @if (selectedInstructor) {
-    <div class="details-card">
-      <div class="details-header">
-        <h3>Details: {{ selectedInstructor.firstName }} {{ selectedInstructor.lastName }} (ID: {{ selectedInstructor.id }})</h3>
-        <button class="btn btn-close" (click)="closeDetails()">Close</button>
+    <div class="details-panel" style="margin-bottom: 24px; padding: 20px; border: 1px solid #cce5ff; border-radius: 8px; background-color: #f0f7ff; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+      <div class="details-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #b8daff; padding-bottom: 10px; margin-bottom: 15px;">
+        <h3 style="margin: 0; color: #0056b3;">
+          Instructor Details — {{ selectedInstructor.firstName }} {{ selectedInstructor.lastName }}
+        </h3>
+        <button class="btn btn-close" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #555;" (click)="closeDetails()">&times;</button>
       </div>
 
-      <div class="details-grid">
-        <p><strong>Course:</strong> {{ selectedInstructor.courseName || 'Not Assigned' }}</p>
-        <p><strong>Age:</strong> {{ selectedInstructor.age !== undefined && selectedInstructor.age !== null ? selectedInstructor.age : 'N/A' }}</p>
-        <p><strong>Email:</strong> {{ selectedInstructor.email || 'N/A' }}</p>
-        <p><strong>Graduated College:</strong> {{ selectedInstructor.graduatedCollege || 'N/A' }}</p>
+      <div class="details-body" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; font-size: 15px;">
+        <div><strong>ID:</strong> {{ selectedInstructor.id }}</div>
+        <div><strong>First Name:</strong> {{ selectedInstructor.firstName }}</div>
+        <div><strong>Last Name:</strong> {{ selectedInstructor.lastName }}</div>
+        <div>
+          <strong>Assigned Course:</strong> 
+          <span class="course-badge" style="background: #e2e3e5; padding: 2px 8px; border-radius: 4px;">
+            {{ getCourseName(selectedInstructor.courseId) }}
+          </span>
+        </div>
+        <div><strong>Age:</strong> {{ selectedInstructor.age ?? selectedInstructor.instructorDetails?.age ?? 'N/A' }}</div>
+        <div><strong>Email:</strong> {{ selectedInstructor.email || selectedInstructor.instructorDetails?.email || 'N/A' }}</div>
+        <div><strong>Graduated College:</strong> {{ selectedInstructor.graduatedCollege || selectedInstructor.instructorDetails?.graduatedCollege || 'N/A' }}</div>
       </div>
     </div>
   }
 
-  <!-- Main Table -->
-  <table class="data-table">
+  <table class="instructors-table">
     <thead>
       <tr>
-        <th style="width: 10%;">ID</th>
-        <th style="width: 30%;">First Name</th>
-        <th style="width: 30%;">Last Name</th>
-        <th style="width: 30%;">Actions</th>
+        <th>ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Assigned Course</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
-      @for (ins of instructors; track ins.id) {
-        <tr>
-          @if (editingId !== ins.id) {
-            <td>{{ ins.id }}</td>
-            <td>{{ ins.firstName }}</td>
-            <td>{{ ins.lastName }}</td>
-            <td>
-              <button class="btn btn-info" (click)="viewDetails(ins)">View Details</button>
-              <button class="btn btn-edit" (click)="startEdit(ins)">Edit</button>
-              <button class="btn btn-delete" (click)="deleteInstructor(ins.id)">Delete</button>
-            </td>
-          } @else {
-            <td>{{ ins.id }}</td>
-            <td><input type="text" [(ngModel)]="editForm.firstName" /></td>
-            <td><input type="text" [(ngModel)]="editForm.lastName" /></td>
-            <td>
-              <button class="btn btn-save" (click)="saveEdit()">Save</button>
-              <button class="btn btn-cancel" (click)="cancelEdit()">Cancel</button>
-            </td>
-          }
-        </tr>
-      }
-
-      <tr class="add-row">
+      <!-- Creation Row -->
+      <tr class="create-row">
         <td><em>Auto</em></td>
         <td>
-          <input type="text" [(ngModel)]="newInstructor.firstName" placeholder="First Name" />
+          <input type="text" placeholder="First Name" [(ngModel)]="newInstructor.firstName" />
         </td>
         <td>
-          <input type="text" [(ngModel)]="newInstructor.lastName" placeholder="Last Name" />
+          <input type="text" placeholder="Last Name" [(ngModel)]="newInstructor.lastName" />
         </td>
         <td>
-          <button class="btn btn-create" (click)="createInstructor()">Add Instructor</button>
+          <select [(ngModel)]="newInstructor.courseId" class="course-select">
+            <option [ngValue]="null">-- Course --</option>
+            @for (course of courses; track course.id) {
+              <option [ngValue]="course.id">{{ course.courseName }}</option>
+            }
+          </select>
+        </td>
+        <td>
+          <button class="btn btn-add" (click)="createInstructor()">Add Instructor</button>
         </td>
       </tr>
+
+      <!-- Data Rows -->
+      @for (instructor of instructors; track instructor.id) {
+        <tr>
+          <td>{{ instructor.id }}</td>
+
+          <td>
+            @if (editingId === instructor.id) {
+              <input type="text" [(ngModel)]="editForm.firstName" />
+            } @else {
+              {{ instructor.firstName }}
+            }
+          </td>
+
+          <td>
+            @if (editingId === instructor.id) {
+              <input type="text" [(ngModel)]="editForm.lastName" />
+            } @else {
+              {{ instructor.lastName }}
+            }
+          </td>
+
+          <td>
+            @if (editingId === instructor.id) {
+              <select [(ngModel)]="editForm.courseId" class="course-select">
+                <option [ngValue]="null">-- None --</option>
+                @for (course of courses; track course.id) {
+                  <option [ngValue]="course.id">{{ course.courseName }}</option>
+                }
+              </select>
+            } @else {
+              @if (instructor.courseId != null) {
+                <span class="course-badge">{{ getCourseName(instructor.courseId) }}</span>
+              } @else {
+                <span class="no-course">None</span>
+              }
+            }
+          </td>
+
+          <td class="actions-cell">
+            @if (editingId === instructor.id) {
+              <button class="btn btn-save" (click)="saveEdit()">Save</button>
+              <button class="btn btn-cancel" (click)="cancelEdit()">Cancel</button>
+            } @else {
+              <button class="btn btn-details" (click)="viewDetails(instructor)">Details</button>
+              <button class="btn btn-edit" (click)="startEdit(instructor)">Edit</button>
+              <button class="btn btn-delete" (click)="deleteInstructor(instructor.id)">Delete</button>
+            }
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="5" class="text-center py-3 text-muted">
+            No instructors found.
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
 </div>

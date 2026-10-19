@@ -2,26 +2,25 @@ package com.example.data.student;
 
 import com.example.data.course.Course;
 import com.example.data.course.CourseRepository;
+import com.example.data.exception.ResourceNotFoundException;
 import com.example.data.student.dto.StudentRequestDto;
 import com.example.data.student.dto.StudentResponseDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class StudentService {
 
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
 
-    public StudentService(StudentRepository studentRepository, CourseRepository courseRepository) {
-        this.studentRepository = studentRepository;
-        this.courseRepository = courseRepository;
-    }
-
-    // Inherits readOnly = true
     public List<StudentResponseDto> getAllStudents() {
         return studentRepository.findAll()
                 .stream()
@@ -29,70 +28,88 @@ public class StudentService {
                 .toList();
     }
 
-
     public StudentResponseDto getStudentById(Long id) {
-        Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
+        Student student = findStudent(id);
         return StudentResponseDto.fromEntity(student);
     }
 
     @Transactional
     public StudentResponseDto createStudent(StudentRequestDto dto) {
-        Student student = new Student(dto.getFirstName(), dto.getLastName());
+        Student student = new Student(dto.firstName(), dto.lastName());
 
-        if (dto.getCourseIds() != null && !dto.getCourseIds().isEmpty()) {
-            List<Course> courses = courseRepository.findAllById(dto.getCourseIds());
-            student.setCourses(courses);
+        if (dto.courseIds() != null && !dto.courseIds().isEmpty()) {
+            List<Course> courses = courseRepository.findAllById(dto.courseIds());
+            if (courses.size() != dto.courseIds().size()) {
+                throw new ResourceNotFoundException("One or more course IDs could not be found");
+            }
+            courses.forEach(student::addCourse);
         }
 
-        return StudentResponseDto.fromEntity(studentRepository.save(student));
+        Student saved = studentRepository.save(student);
+        return StudentResponseDto.fromEntity(saved);
     }
 
     @Transactional
     public StudentResponseDto updateStudent(Long id, StudentRequestDto dto) {
-        Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
+        Student student = findStudent(id);
+        student.setFirstName(dto.firstName());
+        student.setLastName(dto.lastName());
 
-        student.setFirstName(dto.getFirstName());
-        student.setLastName(dto.getLastName());
+        if (dto.courseIds() != null) {
+            List<Course> courses = courseRepository.findAllById(dto.courseIds());
+            if (courses.size() != dto.courseIds().size()) {
+                throw new ResourceNotFoundException("One or more course IDs could not be found");
+            }
 
-        if (dto.getCourseIds() != null) {
-            List<Course> courses = courseRepository.findAllById(dto.getCourseIds());
-            student.setCourses(courses);
+            // Cleanly clear existing and re-add to keep both sides synchronized
+            Set<Course> currentCourses = new HashSet<>(student.getCourses());
+            currentCourses.forEach(student::removeCourse);
+            courses.forEach(student::addCourse);
         }
 
-        return StudentResponseDto.fromEntity(studentRepository.save(student));
-    }
-
-    @Transactional
-    public void deleteStudent(Long id) {
-        Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
-        studentRepository.delete(student);
+        // Dirty checking automatically flushes changes on commit
+        return StudentResponseDto.fromEntity(student);
     }
 
     @Transactional
     public StudentResponseDto enrollInCourse(Long studentId, Long courseId) {
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found with id: " + studentId));
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found with id: " + courseId));
+        Student student = findStudent(studentId);
+        Course course = findCourse(courseId);
 
-        if (!student.getCourses().contains(course)) {
-            student.getCourses().add(course);
-        }
+        student.addCourse(course);
 
-        return StudentResponseDto.fromEntity(studentRepository.save(student));
+        Student saved = studentRepository.saveAndFlush(student);
+        return StudentResponseDto.fromEntity(saved);
     }
 
     @Transactional
     public StudentResponseDto unenrollFromCourse(Long studentId, Long courseId) {
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found with id: " + studentId));
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found with id: " + courseId));
+        Student student = findStudent(studentId);
+        Course course = findCourse(courseId);
 
-        student.getCourses().remove(course);
-        return StudentResponseDto.fromEntity(studentRepository.save(student));
+        student.removeCourse(course);
+
+        Student saved = studentRepository.saveAndFlush(student);
+        return StudentResponseDto.fromEntity(saved);
+    }
+    @Transactional
+    public void deleteStudent(Long id) {
+        Student student = findStudent(id);
+
+
+        Set<Course> courses = new HashSet<>(student.getCourses());
+        courses.forEach(student::removeCourse);
+
+        studentRepository.delete(student);
+    }
+
+    private Student findStudent(Long id) {
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + id));
+    }
+
+    private Course findCourse(Long id) {
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
     }
 }

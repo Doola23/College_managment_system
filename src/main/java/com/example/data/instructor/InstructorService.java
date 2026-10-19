@@ -2,29 +2,22 @@ package com.example.data.instructor;
 
 import com.example.data.course.Course;
 import com.example.data.course.CourseRepository;
+import com.example.data.exception.ResourceNotFoundException;
 import com.example.data.instructor.dto.InstructorRequestDto;
 import com.example.data.instructor.dto.InstructorResponseDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class InstructorService {
 
     private final InstructorRepository instructorRepository;
     private final CourseRepository courseRepository;
-    private final InstructorDetailsRepository instructorDetailsRepository;
-
-    public InstructorService(InstructorRepository instructorRepository,
-                             CourseRepository courseRepository,
-                             InstructorDetailsRepository instructorDetailsRepository) {
-        this.instructorRepository = instructorRepository;
-        this.courseRepository = courseRepository;
-        this.instructorDetailsRepository = instructorDetailsRepository;
-    }
-
 
     public List<InstructorResponseDto> getAllInstructors() {
         return instructorRepository.findAll()
@@ -33,66 +26,88 @@ public class InstructorService {
                 .toList();
     }
 
-
     public InstructorResponseDto getInstructorById(Long id) {
-        Instructor instructor = instructorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Instructor not found with id: " + id));
+        Instructor instructor = findInstructor(id);
         return InstructorResponseDto.fromEntity(instructor);
     }
 
     @Transactional
     public InstructorResponseDto createInstructor(InstructorRequestDto dto) {
-        Instructor instructor = new Instructor(dto.getFirstName(), dto.getLastName());
+        Instructor instructor = new Instructor(dto.firstName().trim(), dto.lastName().trim());
 
-        if (dto.getCourseId() != null) {
-            Course course = courseRepository.findById(dto.getCourseId())
-                    .orElseThrow(() -> new RuntimeException("Course not found with id: " + dto.getCourseId()));
+        if (dto.courseId() != null) {
+            Course course = findCourse(dto.courseId());
             instructor.setCourse(course);
         }
 
-        if (dto.getAge() != null || dto.getEmail() != null || dto.getGraduatedCollege() != null) {
-            InstructorDetails details = new InstructorDetails(dto.getAge(), dto.getEmail(), dto.getGraduatedCollege());
+        String email = normalize(dto.email());
+        String graduatedCollege = normalize(dto.graduatedCollege());
+
+        if (dto.age() != null || email != null || graduatedCollege != null) {
+            InstructorDetails details = new InstructorDetails(dto.age(), email, graduatedCollege);
+            // Explicitly sync both sides of the relationship
             details.setInstructor(instructor);
-            instructor.setInstructorDetails(instructorDetailsRepository.save(details));
+            instructor.setInstructorDetails(details);
         }
 
-        return InstructorResponseDto.fromEntity(instructorRepository.save(instructor));
+        Instructor saved = instructorRepository.saveAndFlush(instructor);
+        return InstructorResponseDto.fromEntity(saved);
     }
 
     @Transactional
     public InstructorResponseDto updateInstructor(Long id, InstructorRequestDto dto) {
-        Instructor instructor = instructorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Instructor not found with id: " + id));
+        Instructor instructor = findInstructor(id);
+        instructor.setFirstName(dto.firstName().trim());
+        instructor.setLastName(dto.lastName().trim());
 
-        instructor.setFirstName(dto.getFirstName());
-        instructor.setLastName(dto.getLastName());
-
-        if (dto.getCourseId() != null) {
-            Course course = courseRepository.findById(dto.getCourseId())
-                    .orElseThrow(() -> new RuntimeException("Course not found with id: " + dto.getCourseId()));
+        // Update or detach course
+        if (dto.courseId() != null) {
+            Course course = findCourse(dto.courseId());
             instructor.setCourse(course);
         } else {
             instructor.setCourse(null);
         }
 
+        String email = normalize(dto.email());
+        String graduatedCollege = normalize(dto.graduatedCollege());
+
         InstructorDetails details = instructor.getInstructorDetails();
-        if (details == null && (dto.getAge() != null || dto.getEmail() != null || dto.getGraduatedCollege() != null)) {
-            details = new InstructorDetails(dto.getAge(), dto.getEmail(), dto.getGraduatedCollege());
-            details.setInstructor(instructor);
-            instructor.setInstructorDetails(instructorDetailsRepository.save(details));
+        if (details == null && (dto.age() != null || email != null || graduatedCollege != null)) {
+            InstructorDetails newDetails = new InstructorDetails(dto.age(), email, graduatedCollege);
+            newDetails.setInstructor(instructor);
+            instructor.setInstructorDetails(newDetails);
         } else if (details != null) {
-            details.setAge(dto.getAge());
-            details.setEmail(dto.getEmail());
-            details.setGraduatedCollege(dto.getGraduatedCollege());
+            details.setAge(dto.age());
+            details.setEmail(email);
+            details.setGraduatedCollege(graduatedCollege);
         }
 
-        return InstructorResponseDto.fromEntity(instructorRepository.save(instructor));
+        Instructor updated = instructorRepository.saveAndFlush(instructor);
+        return InstructorResponseDto.fromEntity(updated);
     }
 
     @Transactional
     public void deleteInstructor(Long id) {
-        Instructor instructor = instructorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Instructor not found with id: " + id));
+        Instructor instructor = findInstructor(id);
+
+        if (instructor.getCourse() != null) {
+            instructor.setCourse(null);
+        }
+
         instructorRepository.delete(instructor);
+    }
+
+    private Instructor findInstructor(Long id) {
+        return instructorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Instructor not found with id: " + id));
+    }
+
+    private Course findCourse(Long id) {
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
+    }
+
+    private String normalize(String value) {
+        return (value == null || value.trim().isEmpty()) ? null : value.trim();
     }
 }

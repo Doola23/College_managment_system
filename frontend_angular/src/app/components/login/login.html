@@ -1,0 +1,63 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <h2>{{ isRegisterMode ? 'Create an Account' : 'College Portal Login' }}</h2>
+
+    @if (errorMessage) {
+      <div class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+    }
+
+    @if (successMessage) {
+      <div class="alert alert-success">
+        {{ successMessage }}
+      </div>
+    }
+
+    <form (ngSubmit)="onSubmit()">
+      <!-- form fields remain the same -->
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          [(ngModel)]="username"
+          placeholder="Enter username"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [(ngModel)]="password"
+          placeholder="Enter password"
+          required
+        />
+        @if (isRegisterMode) {
+          <small class="hint-text">
+            Password must be at least 6 characters and include letters & numbers.
+          </small>
+        }
+      </div>
+
+      <button type="submit" class="btn-primary">
+        {{ isRegisterMode ? 'Sign Up' : 'Sign In' }}
+      </button>
+    </form>
+
+    <div class="toggle-container">
+      @if (isRegisterMode) {
+        <span>Already have an account? </span>
+        <button type="button" class="link-btn" (click)="toggleMode()">Sign In</button>
+      } @else {
+        <span>Don't have an account? </span>
+        <button type="button" class="link-btn" (click)="toggleMode()">Register here</button>
+      }
+    </div>
+  </div>
+</div>

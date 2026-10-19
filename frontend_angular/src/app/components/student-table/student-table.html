@@ -1,59 +1,112 @@
-<div class="table-container">
+<div class="students-container">
   <h2>Students Management</h2>
 
-  <table class="data-table">
-
+  <table class="students-table">
     <thead>
       <tr>
-        <th style="width: 10%;">ID</th>
-        <th style="width: 35%;">First Name</th>
-        <th style="width: 35%;">Last Name</th>
-        <th style="width: 20%;">Actions</th>
+        <th style="width: 80px;">ID</th>
+        <th style="width: 180px;">First Name</th>
+        <th style="width: 180px;">Last Name</th>
+        <th>Enrolled Courses</th>
+        <th style="width: 220px;">Assign Course</th>
+        <th style="width: 160px;">Actions</th>
       </tr>
     </thead>
-
     <tbody>
-  
-      @for (s of students; track s.id) {
-        <tr>
-        
-          @if (editingId !== s.id) {
-            <td>{{ s.id }}</td>
-            <td>{{ s.firstName }}</td>
-            <td>{{ s.lastName }}</td>
-            <td>
-              <button class="btn btn-edit" (click)="startEdit(s)">Edit</button>
-              <button class="btn btn-delete" (click)="deleteStudent(s.id)">Delete</button>
-            </td>
-          } 
-
-          @else {
-            <td>{{ s.id }}</td>
-
-            <td><input type="text" [(ngModel)]="editForm.firstName" /></td>
-            <td><input type="text" [(ngModel)]="editForm.lastName" /></td>
-            <td>
-
-              <button class="btn btn-save" (click)="saveEdit()">Save</button>
-
-              <button class="btn btn-cancel" (click)="cancelEdit()">Cancel</button>
-            </td>
-          }
-        </tr>
-      }
-
-      <tr class="add-row">
+      <!-- Create Row -->
+      <tr class="create-row">
         <td><em>Auto</em></td>
         <td>
-          <input type="text" [(ngModel)]="newStudent.firstName" placeholder="First Name" />
+          <input type="text" placeholder="First Name" [(ngModel)]="newStudent.firstName" />
         </td>
         <td>
-          <input type="text" [(ngModel)]="newStudent.lastName" placeholder="Last Name" />
+          <input type="text" placeholder="Last Name" [(ngModel)]="newStudent.lastName" />
+        </td>
+        <td colspan="2" class="text-muted" style="font-size: 13px;">
+          <em>Courses can be assigned after creation or via the dropdown</em>
         </td>
         <td>
-          <button class="btn btn-create" (click)="createStudent()">Add Student</button>
+          <button class="btn btn-add" (click)="createStudent()">Add Student</button>
         </td>
       </tr>
+
+      <!-- Student Rows -->
+      @for (student of students; track student.id) {
+        <tr>
+          <td>{{ student.id }}</td>
+
+          <td>
+            @if (editingId === student.id) {
+              <input type="text" [(ngModel)]="editFirstName" />
+            } @else {
+              {{ student.firstName }}
+            }
+          </td>
+
+          <td>
+            @if (editingId === student.id) {
+              <input type="text" [(ngModel)]="editLastName" />
+            } @else {
+              {{ student.lastName }}
+            }
+          </td>
+
+          <!-- Badges for enrolled courses -->
+          <td>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+              @for (course of student.courses; track course.id) {
+                <span style="background: #e9ecef; border: 1px solid #ced4da; padding: 3px 8px; border-radius: 12px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                  {{ course.courseName }}
+                  <button 
+                    (click)="unenroll(student.id, course.id)" 
+                    style="border: none; background: transparent; cursor: pointer; color: #dc3545; font-weight: bold; padding: 0 2px;"
+                    title="Unenroll course">&times;</button>
+                </span>
+              } @empty {
+                <span class="text-muted" style="font-size: 13px;">No courses enrolled</span>
+              }
+            </div>
+          </td>
+
+          <!-- Dropdown to assign new courses -->
+          <td>
+            @if (student.id !== undefined) {
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <select [(ngModel)]="selectedCourseToEnroll[student.id]" style="padding: 4px 6px; font-size: 13px; border-radius: 4px;">
+                  <option [ngValue]="null">-- Select Course --</option>
+                  @for (course of getAvailableCourses(student); track course.id) {
+                    <option [ngValue]="course.id">{{ course.courseName }}</option>
+                  }
+                </select>
+                <button 
+                  class="btn btn-save" 
+                  style="padding: 4px 10px; font-size: 12px;"
+                  [disabled]="!selectedCourseToEnroll[student.id]"
+                  (click)="enroll(student.id)">
+                  Assign
+                </button>
+              </div>
+            }
+          </td>
+
+          <!-- Actions -->
+          <td class="actions-cell">
+            @if (editingId === student.id) {
+              <button class="btn btn-save" (click)="saveEdit()">Save</button>
+              <button class="btn btn-cancel" (click)="cancelEdit()">Cancel</button>
+            } @else {
+              <button class="btn btn-edit" (click)="startEdit(student)">Edit</button>
+              <button class="btn btn-delete" (click)="deleteStudent(student.id)">Delete</button>
+            }
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="text-center py-3 text-muted">
+            No students found.
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
 </div>

@@ -1,20 +1,19 @@
 package com.example.data.instructor.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class InstructorRequestDto {
+public record InstructorRequestDto(
+        @NotBlank(message = "First name is mandatory")
+        @Size(max = 50, message = "First name must not exceed 50 characters")
+        String firstName,
 
-    private String firstName;
-    private String lastName;
-    private Long courseId;
-    private Integer age;
-    private String email;
-    private String graduatedCollege;
-}
+        @NotBlank(message = "Last name is mandatory")
+        @Size(max = 50, message = "Last name must not exceed 50 characters")
+        String lastName,
+
+        Long courseId,
+        Integer age,
+        String email,
+        String graduatedCollege
+) {}

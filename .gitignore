@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Logs ###
+derby.log
+
+### Angular / Node ###
+frontend_angular/node_modules/
+frontend_angular/.angular/
+frontend_angular/dist/
+frontend_angular/.cache/
+*.log
